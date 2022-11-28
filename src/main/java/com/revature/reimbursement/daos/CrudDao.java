@@ -1,4 +1,12 @@
 package com.revature.reimbursement.daos;
 
-public class CrudDao {
+import java.util.List;
+
+public interface CrudDao <T> {
+    void save();
+    void delete();
+    void update();
+    T findById();
+    List<T> findAll();
+
 }
