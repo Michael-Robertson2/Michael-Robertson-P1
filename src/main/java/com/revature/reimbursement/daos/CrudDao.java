@@ -3,9 +3,9 @@ package com.revature.reimbursement.daos;
 import java.util.List;
 
 public interface CrudDao <T> {
-    void save();
-    void delete();
-    void update();
+    void save(T obj);
+    void delete(T obj);
+    void update(T obj);
     T findById();
     List<T> findAll();
 

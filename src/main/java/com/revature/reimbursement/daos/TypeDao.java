@@ -5,18 +5,19 @@ import com.revature.reimbursement.models.Type;
 import java.util.List;
 
 public class TypeDao implements CrudDao<Type>{
+
     @Override
-    public void save() {
+    public void save(Type obj) {
 
     }
 
     @Override
-    public void delete() {
+    public void delete(Type obj) {
 
     }
 
     @Override
-    public void update() {
+    public void update(Type obj) {
 
     }
 

@@ -8,13 +8,13 @@ public class User {
     private String givenName;
     private String surname;
     private boolean isActive;
-    private Role role;
+    private String role;
 
     public User() {
 
     }
 
-    public User(String id, String username, String email, String password, String givenName, String surname, boolean isActive, Role role) {
+    public User(String id, String username, String email, String password, String givenName, String surname, boolean isActive, String role) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -22,7 +22,7 @@ public class User {
         this.givenName = givenName;
         this.surname = surname;
         this.isActive = isActive;
-        this.role = role;
+        this.role = "b06a2afc-702c-11ed-a1eb-0242ac120002"; //id associated with the User role in the database.
     }
 
     public String getId() {
@@ -81,11 +81,11 @@ public class User {
         isActive = active;
     }
 
-    public Role getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(String role) {
         this.role = role;
     }
 

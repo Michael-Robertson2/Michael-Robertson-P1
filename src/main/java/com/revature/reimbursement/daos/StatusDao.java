@@ -5,18 +5,19 @@ import com.revature.reimbursement.models.Status;
 import java.util.List;
 
 public class StatusDao implements CrudDao<Status> {
+
     @Override
-    public void save() {
+    public void save(Status obj) {
 
     }
 
     @Override
-    public void delete() {
+    public void delete(Status obj) {
 
     }
 
     @Override
-    public void update() {
+    public void update(Status obj) {
 
     }
 
