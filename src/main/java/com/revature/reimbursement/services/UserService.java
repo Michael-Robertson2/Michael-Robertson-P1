@@ -21,9 +21,11 @@ public class UserService {
 
     public void saveUser(NewUserRequest req) {
         List<String> usernames = userDao.findAllUsernames();
+        List<String> emails = userDao.findAllEmails();
 
         if (!isValidUsername(req.getUsername())) throw new InvalidUserException("Username must be 8-20 characters long.");
         if (usernames.contains(req.getUsername())) throw new InvalidUserException("Username is already in use.");
+        if (emails.contains(req.getEmail())) throw new InvalidUserException("Email is already in use.");
         if (!isValidPassword(req.getPassword1())) throw new InvalidUserException("Password must have a minimum eight characters, at least one letter and one number");
         if (!req.getPassword1().equals(req.getPassword2())) throw new InvalidUserException("Passwords do not match.");
 
@@ -36,7 +38,15 @@ public class UserService {
         User validUser = userDao.getUserByUsernameAndPassword(req.getUsername(), req.getPassword());
         if (validUser == null) throw new InvalidAuthException("Invalid Username or Password");
 
-        return new Principal(validUser.getId(), validUser.getUsername(), validUser.getRole());
+        return new Principal(validUser.getId(), validUser.getUsername(), validUser.getEmail(), validUser.getGivenName(), validUser.getSurname(), validUser.isActive(), validUser.getRole());
+    }
+
+    public List<User> getAllUsers() {
+        return userDao.findAll();
+    }
+
+    public List<User> getAllUserByUsername(String username) {
+        return userDao.getAllUsersByUsername(username);
     }
 
     private boolean isValidUsername(String username) {

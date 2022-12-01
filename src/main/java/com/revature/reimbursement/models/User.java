@@ -22,7 +22,7 @@ public class User {
         this.givenName = givenName;
         this.surname = surname;
         this.isActive = isActive;
-        this.role = "b06a2afc-702c-11ed-a1eb-0242ac120002"; //id associated with the User role in the database.
+        this.role = role; //id associated with the User role in the database is b06a2afc-702c-11ed-a1eb-0242ac120002.
     }
 
     public String getId() {

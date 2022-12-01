@@ -32,6 +32,7 @@ public class AuthHandler {
         try {
             Principal principal = userService.login(req);
             String token = tokenService.generateToken(principal);
+
             ctx.res.setHeader("authorization", token);
             ctx.json(principal);
 
