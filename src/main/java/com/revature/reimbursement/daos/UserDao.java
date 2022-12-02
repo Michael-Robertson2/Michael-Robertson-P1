@@ -43,7 +43,7 @@ public class UserDao implements CrudDao<User>{
     }
 
     @Override
-    public User findById() {
+    public User findById(String id) {
         return null;
     }
 

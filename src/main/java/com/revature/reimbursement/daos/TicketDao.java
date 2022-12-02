@@ -44,11 +44,39 @@ public class TicketDao implements CrudDao<Ticket> {
     @Override
     public void update(Ticket obj) {
 
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+
+            PreparedStatement ps = con.prepareStatement("UPDATE ers_reimbursements SET resolved= ?, resolver_id= ?, status_id= ? " +
+                                                        "WHERE reimb_id= ?");
+
+            ps.setTimestamp(1, obj.getResolved());
+            ps.setString(2, obj.getResolver_id());
+            ps.setString(3, obj.getStatus_id());
+            ps.setString(4, obj.getId());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
-    public Ticket findById() {
-        return null;
+    public Ticket findById(String id) {
+        Ticket ticket = null;
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE reimb_id= ?");
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next())
+                ticket = new Ticket(rs.getString("reimb_id"), rs.getDouble("amount"), rs.getTimestamp("submitted"),
+                                    rs.getTimestamp("resolved"), rs.getString("description"), rs.getBytes("receipt"),
+                                    rs.getString("payment_id"), rs.getString("author_id"), rs.getString("resolver_id"),
+                                    rs.getString("status_id"), rs.getString("type_id"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ticket;
     }
 
     @Override

@@ -22,7 +22,7 @@ public class TypeDao implements CrudDao<Type>{
     }
 
     @Override
-    public Type findById() {
+    public Type findById(String id) {
         return null;
     }
 

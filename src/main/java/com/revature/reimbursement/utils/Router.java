@@ -43,6 +43,7 @@ public class Router {
 
             path("/ticket", () -> {
                 post(c -> ticketHandler.submitTicket(c));
+                put(c -> ticketHandler.updateTicket(c));
             });
         });
 

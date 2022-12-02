@@ -22,7 +22,7 @@ public class StatusDao implements CrudDao<Status> {
     }
 
     @Override
-    public Status findById() {
+    public Status findById(String id) {
         return null;
     }
 
