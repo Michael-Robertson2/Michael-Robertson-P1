@@ -62,7 +62,6 @@ public class UserHandler {
     public void getAllUsersByUsername(Context ctx) {
         try {
             String token = ctx.req.getHeader("authorization");
-            System.out.println(token);
             if (token == null || token.equals("")) throw new InvalidAuthException("You are not signed in.");
 
             Principal principal = tokenService.extractRequesterDetails(token);
