@@ -12,6 +12,8 @@ import org.eclipse.jetty.util.DateCache;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class TicketService {
@@ -53,5 +55,12 @@ public class TicketService {
                                         req.getResolver_id(), new_status_id, currentTicket.getType_id());
         ticketDao.update(updatedTicket);
 
+    }
+    public List<Ticket> getAllPending() {
+        return ticketDao.getAllPending();
+    }
+
+    public List<Ticket> getAllResolved() {
+        return ticketDao.getAllResolved();
     }
 }

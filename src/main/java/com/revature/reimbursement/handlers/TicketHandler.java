@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.reimbursement.dtos.requests.NewTicketRequest;
 import com.revature.reimbursement.dtos.requests.NewUpdateRequest;
 import com.revature.reimbursement.dtos.responses.Principal;
+import com.revature.reimbursement.models.Ticket;
 import com.revature.reimbursement.services.TicketService;
 import com.revature.reimbursement.services.TokenService;
 import com.revature.reimbursement.utils.custom_exceptions.InvalidAuthException;
@@ -14,6 +15,7 @@ import io.javalin.http.Context;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 
 public class TicketHandler {
 
@@ -89,5 +91,47 @@ public class TicketHandler {
         }
 
 
+    }
+
+    public void getAllPending(Context ctx) {
+        String token;
+        Principal principal;
+        try {
+            token = ctx.req.getHeader("authorization");
+            if (token == null || token.equals("")) throw new InvalidAuthException("You are not logged in");
+
+            principal = tokenService.extractRequesterDetails(token);
+            if (principal == null) throw new InvalidAuthException("Invalid Token");
+
+            if (!principal.getRole().equals("b06a2afc-702c-11ed-a1eb-0242ac120004"))
+                throw new InvalidAuthException("Only finance managers can view submitted tickets.");
+
+            List<Ticket> tickets = ticketService.getAllPending();
+            ctx.json(tickets);
+        } catch (InvalidAuthException e) {
+            ctx.status(401);
+            ctx.json(e);
+        }
+    }
+
+    public void getAllResolved(Context ctx) {
+        String token;
+        Principal principal;
+        try {
+            token = ctx.req.getHeader("authorization");
+            if (token == null || token.equals("")) throw new InvalidAuthException("You are not logged in");
+
+            principal = tokenService.extractRequesterDetails(token);
+            if (principal == null) throw new InvalidAuthException("Invalid Token");
+
+            if (!principal.getRole().equals("b06a2afc-702c-11ed-a1eb-0242ac120004"))
+                throw new InvalidAuthException("Only finance managers can view submitted tickets.");
+
+            List<Ticket> tickets = ticketService.getAllResolved();
+            ctx.json(tickets);
+        } catch (InvalidAuthException e) {
+            ctx.status(401);
+            ctx.json(e);
+        }
     }
 }

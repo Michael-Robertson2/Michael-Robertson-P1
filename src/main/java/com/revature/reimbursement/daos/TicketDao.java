@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TicketDao implements CrudDao<Ticket> {
@@ -112,5 +113,44 @@ public class TicketDao implements CrudDao<Ticket> {
             e.printStackTrace();
         }
         return id;
+    }
+
+    public List<Ticket> getAllPending() {
+        List<Ticket> tickets = new ArrayList<>();
+
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE status_id= ?");
+            ps.setString(1, getStatusIdByName("PENDING"));
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next())
+                tickets.add(new Ticket(rs.getString("reimb_id"), rs.getDouble("amount"), rs.getTimestamp("submitted"),
+                        rs.getTimestamp("resolved"), rs.getString("description"), rs.getBytes("receipt"),
+                        rs.getString("payment_id"), rs.getString("author_id"), rs.getString("resolver_id"),
+                        rs.getString("status_id"), rs.getString("type_id")));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tickets;
+    }
+
+    public List<Ticket> getAllResolved() {
+        List<Ticket> tickets = new ArrayList<>();
+
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE status_id= ? OR status_id= ?");
+            ps.setString(1, getStatusIdByName("APPROVED"));
+            ps.setString(2, getStatusIdByName("DENIED"));
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next())
+                tickets.add(new Ticket(rs.getString("reimb_id"), rs.getDouble("amount"), rs.getTimestamp("submitted"),
+                        rs.getTimestamp("resolved"), rs.getString("description"), rs.getBytes("receipt"),
+                        rs.getString("payment_id"), rs.getString("author_id"), rs.getString("resolver_id"),
+                        rs.getString("status_id"), rs.getString("type_id")));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tickets;
     }
 }

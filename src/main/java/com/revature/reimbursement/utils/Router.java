@@ -44,6 +44,8 @@ public class Router {
             path("/ticket", () -> {
                 post(c -> ticketHandler.submitTicket(c));
                 put(c -> ticketHandler.updateTicket(c));
+                get("/pending", c -> ticketHandler.getAllPending(c));
+                get("/resolved", c ->ticketHandler.getAllResolved(c));
             });
         });
 
