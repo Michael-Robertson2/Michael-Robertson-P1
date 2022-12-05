@@ -26,6 +26,10 @@ insert into ers_users (user_id, username, email, "password" , given_name, surnam
 							values ('09879a64-746c-11ed-a1eb-0242ac120002', 'Tester01', 'Test@test.com', 'Passw0rd',
 									'Testy', 'Test', true, 'b06a2afc-702c-11ed-a1eb-0242ac120002');
 
+insert into ers_users (user_id, username, email, "password" , given_name, surname, is_active, role_id)
+							values ('09879a64-746c-11ed-a1eb-0242ac120003', 'Tester02', 'Test2@test.com', 'Passw0rd',
+									'Testy', 'Test', true, 'b06a2afc-702c-11ed-a1eb-0242ac120002');
+
 insert into ers_reimbursements (reimb_id, amount, submitted, resolved, description, receipt, payment_id, author_id,
 								resolver_id, status_id, type_id) values ('3102e878-746c-11ed-a1eb-0242ac120002',
 								'250', CURRENT_TIMESTAMP, null, 'Lunch', null, null, '09879a64-746c-11ed-a1eb-0242ac120002',

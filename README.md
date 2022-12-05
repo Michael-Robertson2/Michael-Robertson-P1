@@ -38,3 +38,5 @@ The database is arranged in such a way that it qualifies as 3rd Normal Form. Thi
 - **JSON Web Tokens**
 - **JUnit**
 - **Mockito**
+
+(Special thanks to Elias Gonzales, who provided a template for this readme)
