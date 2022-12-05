@@ -3,6 +3,7 @@ package com.revature.reimbursement.daos;
 import com.revature.reimbursement.models.Ticket;
 import com.revature.reimbursement.utils.ConnectionFactory;
 
+import javax.naming.Context;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -85,6 +86,38 @@ public class TicketDao implements CrudDao<Ticket> {
         return null;
     }
 
+    public void editDescription(String id, String description) {
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("update ers_reimbursements set description= ? where reimb_id= ?");
+            ps.setString(1, description);
+            ps.setString(2, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void editAmount(String id, double amount) {
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("update ers_reimbursements set amount= ? where reimb_id= ?");
+            ps.setDouble(1, amount);
+            ps.setString(2, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteTicket(String id) {
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("delete from ers_reimbursements where reimb_id= ?");
+            ps.setString(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public String getTypeIdByName (String name) {
         String id = null;
         try (Connection con = ConnectionFactory.getInstance().getConnection()){
@@ -141,6 +174,145 @@ public class TicketDao implements CrudDao<Ticket> {
             PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE status_id= ? OR status_id= ?");
             ps.setString(1, getStatusIdByName("APPROVED"));
             ps.setString(2, getStatusIdByName("DENIED"));
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next())
+                tickets.add(new Ticket(rs.getString("reimb_id"), rs.getDouble("amount"), rs.getTimestamp("submitted"),
+                        rs.getTimestamp("resolved"), rs.getString("description"), rs.getBytes("receipt"),
+                        rs.getString("payment_id"), rs.getString("author_id"), rs.getString("resolver_id"),
+                        rs.getString("status_id"), rs.getString("type_id")));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tickets;
+    }
+
+    public List<Ticket> getOwn(String id) {
+        List<Ticket> tickets = new ArrayList<>();
+
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("select * from ers_reimbursements where author_id= ?");
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next())
+                tickets.add(new Ticket(rs.getString("reimb_id"), rs.getDouble("amount"), rs.getTimestamp("submitted"),
+                        rs.getTimestamp("resolved"), rs.getString("description"), rs.getBytes("receipt"),
+                        rs.getString("payment_id"), rs.getString("author_id"), rs.getString("resolver_id"),
+                        rs.getString("status_id"), rs.getString("type_id")));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tickets;
+    }
+
+    public List<Ticket> getOwnPendingRecentFirst(String id) {
+        List<Ticket> tickets = new ArrayList<>();
+
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("select * from ers_reimbursements where author_id= ? and status_id= ? order by submitted DESC");
+            ps.setString(1, id);
+            ps.setString(2, getStatusIdByName("PENDING"));
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next())
+                tickets.add(new Ticket(rs.getString("reimb_id"), rs.getDouble("amount"), rs.getTimestamp("submitted"),
+                    rs.getTimestamp("resolved"), rs.getString("description"), rs.getBytes("receipt"),
+                    rs.getString("payment_id"), rs.getString("author_id"), rs.getString("resolver_id"),
+                    rs.getString("status_id"), rs.getString("type_id")));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tickets;
+    }
+
+    public List<Ticket> getOwnPendingOldFirst(String id) {
+        List<Ticket> tickets = new ArrayList<>();
+
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("select * from ers_reimbursements where author_id= ? and status_id= ? order by submitted");
+            ps.setString(1, id);
+            ps.setString(2, getStatusIdByName("PENDING"));
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next())
+                tickets.add(new Ticket(rs.getString("reimb_id"), rs.getDouble("amount"), rs.getTimestamp("submitted"),
+                        rs.getTimestamp("resolved"), rs.getString("description"), rs.getBytes("receipt"),
+                        rs.getString("payment_id"), rs.getString("author_id"), rs.getString("resolver_id"),
+                        rs.getString("status_id"), rs.getString("type_id")));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tickets;
+    }
+
+    public List<Ticket> getOwnResolvedRecentFirst(String id) {
+        List<Ticket> tickets = new ArrayList<>();
+
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("select * from ers_reimbursements where author_id= ? and status_id!= ? order by submitted DESC");
+            ps.setString(1, id);
+            ps.setString(2, getStatusIdByName("PENDING"));
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next())
+                tickets.add(new Ticket(rs.getString("reimb_id"), rs.getDouble("amount"), rs.getTimestamp("submitted"),
+                        rs.getTimestamp("resolved"), rs.getString("description"), rs.getBytes("receipt"),
+                        rs.getString("payment_id"), rs.getString("author_id"), rs.getString("resolver_id"),
+                        rs.getString("status_id"), rs.getString("type_id")));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tickets;
+    }
+
+    public List<Ticket> getOwnResolvedOldFirst(String id) {
+        List<Ticket> tickets = new ArrayList<>();
+
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("select * from ers_reimbursements where author_id= ? and status_id!= ? order by submitted");
+            ps.setString(1, id);
+            ps.setString(2, getStatusIdByName("PENDING"));
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next())
+                tickets.add(new Ticket(rs.getString("reimb_id"), rs.getDouble("amount"), rs.getTimestamp("submitted"),
+                        rs.getTimestamp("resolved"), rs.getString("description"), rs.getBytes("receipt"),
+                        rs.getString("payment_id"), rs.getString("author_id"), rs.getString("resolver_id"),
+                        rs.getString("status_id"), rs.getString("type_id")));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tickets;
+    }
+
+    public List<Ticket> getOwnResolvedRejectedFirst(String id) {
+        List<Ticket> tickets = new ArrayList<>();
+
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("select * from ers_reimbursements where author_id= ? and status_id!= ? order by status_id DESC");
+            ps.setString(1, id);
+            ps.setString(2, getStatusIdByName("PENDING"));
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next())
+                tickets.add(new Ticket(rs.getString("reimb_id"), rs.getDouble("amount"), rs.getTimestamp("submitted"),
+                        rs.getTimestamp("resolved"), rs.getString("description"), rs.getBytes("receipt"),
+                        rs.getString("payment_id"), rs.getString("author_id"), rs.getString("resolver_id"),
+                        rs.getString("status_id"), rs.getString("type_id")));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tickets;
+    }
+
+    public List<Ticket> getOwnResolvedApprovedFirst(String id) {
+        List<Ticket> tickets = new ArrayList<>();
+
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("select * from ers_reimbursements where author_id= ? and status_id!= ? order by status_id");
+            ps.setString(1, id);
+            ps.setString(2, getStatusIdByName("PENDING"));
             ResultSet rs = ps.executeQuery();
 
             while (rs.next())

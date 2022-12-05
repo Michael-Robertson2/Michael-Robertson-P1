@@ -19,19 +19,11 @@ public class UserService {
         this.userDao = userDao;
     }
 
-    public void saveUser(NewUserRequest req) {
-        List<String> usernames = userDao.findAllUsernames();
-        List<String> emails = userDao.findAllEmails();
-
-        if (!isValidUsername(req.getUsername())) throw new InvalidUserException("Username must be 8-20 characters long.");
-        if (usernames.contains(req.getUsername())) throw new InvalidUserException("Username is already in use.");
-        if (emails.contains(req.getEmail())) throw new InvalidUserException("Email is already in use.");
-        if (!isValidPassword(req.getPassword1())) throw new InvalidUserException("Password must have a minimum eight characters, at least one letter and one number");
-        if (!req.getPassword1().equals(req.getPassword2())) throw new InvalidUserException("Passwords do not match.");
-
+    public User signUp(NewUserRequest req, String role) {
         User createdUser = new User(UUID.randomUUID().toString(), req.getUsername(), req.getEmail(), req.getPassword1(),req.getGivenName(), req.getSurname(),
-                                    true, "b06a2afc-702c-11ed-a1eb-0242ac120002");
+                                    false, getRoleIdByName(role));
         userDao.save(createdUser);
+        return createdUser;
     }
 
     public Principal login(NewLoginRequest req) {
@@ -49,11 +41,38 @@ public class UserService {
         return userDao.getAllUsersByUsername(username);
     }
 
-    private boolean isValidUsername(String username) {
+    public void activateAccount(String username) {
+        userDao.activateAccount(username);
+    }
+
+    public void deleteAccount(String username) {
+        userDao.deleteAccount(username);
+    }
+
+    public boolean isValidUsername(String username) {
         return username.matches("^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$");
     }
 
-    private boolean isValidPassword(String password) {
+    public boolean isValidPassword(String password) {
         return password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$");
     }
+
+    public boolean isDuplicateUsername(String username) {
+        List<String> usernames = userDao.findAllUsernames();
+        return usernames.contains(username);
+    }
+
+    public boolean isDuplicateEmail(String email) {
+        List<String> emails = userDao.findAllEmails();
+        return emails.contains(email);
+    }
+
+    public boolean isSamePassword(String pass1, String pass2) {
+        return pass1.equals(pass2);
+    }
+
+    public String getRoleIdByName(String role) {
+        return userDao.getRoleIdByName(role);
+    }
+
 }

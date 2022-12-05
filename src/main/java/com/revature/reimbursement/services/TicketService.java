@@ -24,37 +24,37 @@ public class TicketService {
         this.ticketDao = ticketDao;
     }
 
-    public void submitTicket(NewTicketRequest req) {
-        double amount = Math.round(req.getAmount()*100.0)/100.0;
-        if (amount <= 0) throw new InvalidTicketException("Invalid amount submitted");
-        String description = req.getDescription();
-        if(description == null || description.equals("")) throw new InvalidTicketException("Ticket description required");
-        String type_id = ticketDao.getTypeIdByName(req.getType_id());
-        if(type_id == null) throw new InvalidTicketException("Invalid type specified");
+    public Ticket submitTicket(NewTicketRequest req) {
 
-        Ticket createdTicket = new Ticket(UUID.randomUUID().toString(), amount, Timestamp.from(Instant.now()), null,
-                                    description, null, null, req.getAuthor_id(),
-                            null, ticketDao.getStatusIdByName("PENDING"), type_id);
+        Ticket createdTicket = new Ticket(UUID.randomUUID().toString(), req.getAmount(), Timestamp.from(Instant.now()), null,
+                                    req.getDescription(), null, null, req.getAuthor_id(),
+                            null, ticketDao.getStatusIdByName("PENDING"), req.getType_id());
 
         ticketDao.save(createdTicket);
+
+        return createdTicket;
     }
 
-    public void updateTicket(NewUpdateRequest req) {
-        Ticket currentTicket = ticketDao.findById(req.getTicket_id());
-        if (currentTicket == null) throw new InvalidUpdateException("Invalid ticket");
-
-        String old_status_id = currentTicket.getStatus_id();
-        if (!old_status_id.equals(ticketDao.getStatusIdByName("PENDING"))) throw new InvalidUpdateException("This ticket has already been resolved");
-
-        String new_status_id = ticketDao.getStatusIdByName(req.getNew_status());
-        if(new_status_id == null || new_status_id.equals("") || new_status_id.equals(ticketDao.getStatusIdByName("PENDING")))
-            throw new InvalidUpdateException("Requested new status is invalid");
+    public Ticket updateTicket(Ticket currentTicket, NewUpdateRequest req) {
 
         Ticket updatedTicket = new Ticket(currentTicket.getId(), currentTicket.getAmount(), currentTicket.getSubmitted(), Timestamp.from(Instant.now()),
                                         currentTicket.getDescription(), currentTicket.getReceipt(), currentTicket.getPayment_id(), currentTicket.getAuthor_id(),
-                                        req.getResolver_id(), new_status_id, currentTicket.getType_id());
+                                        req.getResolver_id(), req.getNew_status(), currentTicket.getType_id());
         ticketDao.update(updatedTicket);
 
+        return updatedTicket;
+    }
+
+    public void editDescription(String id, String description) {
+        ticketDao.editDescription(id, description);
+    }
+
+    public void editAmount(String id, double amount) {
+        ticketDao.editAmount(id, amount);
+    }
+
+    public void deleteTicket(String id) {
+        ticketDao.deleteTicket(id);
     }
     public List<Ticket> getAllPending() {
         return ticketDao.getAllPending();
@@ -63,4 +63,65 @@ public class TicketService {
     public List<Ticket> getAllResolved() {
         return ticketDao.getAllResolved();
     }
+
+    public List<Ticket> getOwn(String id) {
+        return ticketDao.getOwn(id);
+    }
+
+    public List<Ticket> getOwnPendingRecentFirst(String id) {
+        return ticketDao.getOwnPendingRecentFirst(id);
+    }
+
+    public List<Ticket> getOwnPendingOldFirst(String id) {
+        return ticketDao.getOwnPendingOldFirst(id);
+    }
+
+    public List<Ticket> getOwnResolvedRecentFirst(String id) {
+        return ticketDao.getOwnResolvedRecentFirst(id);
+    }
+
+    public List<Ticket> getOwnResolvedOldFirst(String id) {
+        return ticketDao.getOwnResolvedOldFirst(id);
+    }
+
+    public List<Ticket> getOwnResolvedRejectedFirst(String id) { return ticketDao.getOwnResolvedRejectedFirst(id); }
+
+    public List<Ticket> getOwnResolvedApprovedFirst(String id) { return ticketDao.getOwnResolvedApprovedFirst(id); }
+
+    public boolean isValidAmount(double amount) {
+        return (amount > 0 && amount < 10000);
+    }
+
+    public boolean isValidDescription(String description) {
+        return (description != null && !description.equals(""));
+    }
+
+    public boolean isValidType(String id) {
+        return (id != null);
+    }
+
+    public boolean isValidTicket(Ticket ticket) {
+        return (ticket != null);
+    }
+
+    public boolean isPending(String id) {
+        return id.equals(ticketDao.getStatusIdByName("PENDING"));
+    }
+
+    public boolean isValidStatus(String status) {
+        return (status != null);
+    }
+
+    public String getTypeIdByName(String type) {
+        return ticketDao.getTypeIdByName(type);
+    }
+
+    public Ticket getTicketById(String id) {
+        return ticketDao.findById(id);
+    }
+
+    public String getStatusByName(String name) {
+        return ticketDao.getStatusIdByName(name);
+    }
+
 }

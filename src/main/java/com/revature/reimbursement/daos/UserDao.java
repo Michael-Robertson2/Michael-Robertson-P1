@@ -126,4 +126,45 @@ public class UserDao implements CrudDao<User>{
         }
         return users;
     }
+
+    public String getRoleIdByName(String name) {
+        String id = null;
+
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("select role_id from ers_user_roles where role= ?");
+            ps.setString(1, name);
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next())
+                id = rs.getString("role_id");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return id;
+    }
+
+    public void activateAccount(String username) {
+
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+
+            PreparedStatement ps = con.prepareStatement("update ers_users set is_active= true where username= ?");
+            ps.setString(1, username);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteAccount(String username) {
+
+        try (Connection con = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement ps = con.prepareStatement("delete from ers_users where username= ?");
+            ps.setString(1, username);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

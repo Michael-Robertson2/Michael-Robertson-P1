@@ -32,20 +32,33 @@ public class Router {
 
         app.routes(() -> {
             path("/users", () -> {
-                get(c -> userHandler.getAllUsers(c));
-                get("/name", c -> userHandler.getAllUsersByUsername(c));
-                post(c -> userHandler.signup(c));
+                get(userHandler::getAllUsers);
+                get("/name", userHandler::getAllUsersByUsername);
+                post(userHandler::signup);
+                post("manager", userHandler::managerSignUp);
+                put(userHandler::activateAccount);
+                delete(userHandler::deleteAccount);
             });
 
             path("/auth", () -> {
-                post(c -> authHandler.authenticateUser(c));
+                post(authHandler::authenticateUser);
             });
 
             path("/ticket", () -> {
-                post(c -> ticketHandler.submitTicket(c));
-                put(c -> ticketHandler.updateTicket(c));
-                get("/pending", c -> ticketHandler.getAllPending(c));
-                get("/resolved", c ->ticketHandler.getAllResolved(c));
+                post(ticketHandler::submitTicket);
+                put(ticketHandler::updateTicket);
+                put("/self", ticketHandler::editDescription);
+                put("/self/amount", ticketHandler::editAmount);
+                get("/pending", ticketHandler::getAllPending);
+                get("/resolved", ticketHandler::getAllResolved);
+                get("/self", ticketHandler::getOwn);
+                get("/pending/self/recent", ticketHandler::getOwnPendingRecentFirst);
+                get("/pending/self/old", ticketHandler::getOwnPendingOldFirst);
+                get("/resolved/self/recent", ticketHandler::getOwnResolvedRecentFirst);
+                get("/resolved/self/old", ticketHandler::getOwnResolvedOldFirst);
+                get("/resolved/self/rejected", ticketHandler::getOwnResolvedRejectedFirst);
+                get("/resolved/self/approved", ticketHandler::getOwnResolvedApprovedFirst);
+                delete(ticketHandler::deleteTicket);
             });
         });
 
